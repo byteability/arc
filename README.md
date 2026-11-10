@@ -43,3 +43,10 @@ Exit codes: `0` ok, `1` error, `2` usage/config error.
 ```sh
 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
+
+## Releases
+
+Releases are automated with [release-please](https://github.com/googleapis/release-please) from Conventional Commit messages.
+It keeps a release PR open that bumps `version` in `pyproject.toml` and updates `CHANGELOG.md`;
+merging that PR tags `vX.Y.Z`, creates the GitHub release, and attaches the sdist, wheel and `SHA256SUMS`.
+Before 1.0: `fix:` → patch, `feat:` and breaking changes → minor. Don't edit the version or push tags by hand.

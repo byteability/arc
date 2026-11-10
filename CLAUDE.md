@@ -16,6 +16,7 @@ The source folder is deleted only with `--delete`, after the archive is verified
 
 - Tests: `PYTHONPATH=src python3 -m unittest discover -s tests`
 - Install: `uv tool install --python ">=3.14" .` (plain `uv tool install .` may pick an older Python)
+- Releases: automated by release-please from Conventional Commits (merge its release PR). Never edit `version` in `pyproject.toml` or push `v*` tags by hand.
 
 ## Invariants (do not break)
 
