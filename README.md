@@ -35,6 +35,7 @@ arc restore proj-20261110T101530Z [--to DIR] [--force]
 
 History is stored in `$ARCHIVE_DIR/history.jsonl`, one JSON object per line.
 
+Progress bars for `add` and `restore` are shown on stderr when it is a terminal (never in pipes or scripts).
 Notes: symlinks are archived as links; `.DS_Store` files are skipped; extended attributes are not preserved.
 Exit codes: `0` ok, `1` error, `2` usage/config error.
 
