@@ -26,4 +26,4 @@ The source folder is deleted only with `--delete`, after the archive is verified
 
 ## Specs
 
-Requirements and design live in `openspec/` (change `add-archive-cli`). Update the specs when behavior changes.
+Requirements live in `openspec/specs/`; past changes (proposal, design, tasks) in `openspec/changes/archive/`. Update the specs when behavior changes.
