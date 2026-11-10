@@ -7,17 +7,9 @@ import tarfile
 from arc import archiver, config, history, restore
 from arc.archiver import ArchiveError
 from arc.config import ConfigError
+from arc.progress import Progress, human_size
 
 EXIT_OK, EXIT_ERROR, EXIT_USAGE = 0, 1, 2
-
-
-def human_size(n: int) -> str:
-    size = float(n)
-    for unit in ("B", "KB", "MB", "GB", "TB"):
-        if size < 1024 or unit == "TB":
-            return f"{size:.0f} {unit}" if unit == "B" else f"{size:.1f} {unit}"
-        size /= 1024
-    raise AssertionError("unreachable")
 
 
 def format_row(r: dict) -> str:
@@ -49,10 +41,10 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def run(args: argparse.Namespace) -> None:
+def run(args: argparse.Namespace, progress: Progress) -> None:
     cfg = config.load({"ARCHIVE_DIR": args.archive_dir})
     if args.command == "add":
-        rec = archiver.create(args.folder, cfg, delete=args.delete)
+        rec = archiver.create(args.folder, cfg, delete=args.delete, progress=progress)
         print(f"{rec['id']}  {cfg.archive_dir / rec['archive_path']}")
         if rec["source_deleted"]:
             print(f"deleted {rec['source_path']}")
@@ -62,19 +54,19 @@ def run(args: argparse.Namespace) -> None:
         for r in rows:
             print(format_row(r))
     elif args.command == "restore":
-        print(f"restored to {restore.restore(cfg, args.id, to=args.to, force=args.force)}")
+        dest = restore.restore(cfg, args.id, to=args.to, force=args.force, progress=progress)
+        print(f"restored to {dest}")
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    progress = Progress()
     try:
-        run(args)
-    except ConfigError as e:
+        run(args, progress)
+    except (ConfigError, ArchiveError, OSError, tarfile.TarError) as e:
+        progress.close()
         print(f"arc: error: {e}", file=sys.stderr)
-        return EXIT_USAGE
-    except (ArchiveError, OSError, tarfile.TarError) as e:
-        print(f"arc: error: {e}", file=sys.stderr)
-        return EXIT_ERROR
+        return EXIT_USAGE if isinstance(e, ConfigError) else EXIT_ERROR
     return EXIT_OK
 
 

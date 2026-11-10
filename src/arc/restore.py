@@ -4,12 +4,14 @@ import getpass
 import os
 import socket
 import tarfile
+from compression import zstd
 from datetime import UTC, datetime
 from pathlib import Path
 
 from arc import history
 from arc.archiver import ArchiveError, iso, sha256_file
 from arc.config import Config
+from arc.progress import CountingReader, Progress
 
 
 def find(archive_dir: Path, archive_id: str) -> dict:
@@ -19,12 +21,14 @@ def find(archive_dir: Path, archive_id: str) -> dict:
     raise ArchiveError(f"no archive with id {archive_id!r} in history")
 
 
-def restore(config: Config, archive_id: str, to: str | Path | None = None, force: bool = False) -> Path:
+def restore(config: Config, archive_id: str, to: str | Path | None = None, force: bool = False,
+            progress: Progress | None = None) -> Path:
+    progress = progress or Progress(enabled=False)
     record = find(config.archive_dir, archive_id)
     archive = config.archive_dir / record["archive_path"]
     if not archive.is_file():
         raise ArchiveError(f"archive file missing: {archive}")
-    if sha256_file(archive) != record["sha256"]:
+    if sha256_file(archive, progress) != record["sha256"]:
         raise ArchiveError(f"checksum mismatch, archive may be corrupted: {archive}")
 
     source = Path(record["source_path"])
@@ -45,8 +49,11 @@ def restore(config: Config, archive_id: str, to: str | Path | None = None, force
                 existing.unlink()
         return tarfile.tar_filter(member, dest_path)
 
-    with tarfile.open(archive, "r:zst") as tar:
-        tar.extractall(target_dir, filter=extract_filter)
+    progress.phase("extracting", archive.stat().st_size)
+    with archive.open("rb") as raw, zstd.ZstdFile(CountingReader(raw, progress)) as z:
+        with tarfile.open(fileobj=z, mode="r|") as tar:
+            tar.extractall(target_dir, filter=extract_filter)
+    progress.end()
 
     history.append(config.archive_dir, {
         "event": "restore",
