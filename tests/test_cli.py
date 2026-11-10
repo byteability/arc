@@ -1,9 +1,16 @@
 import contextlib
 import io
 import os
+import tarfile
+from unittest import mock
 
 from arc import cli
 from helpers import TempEnvCase
+
+
+class FakeTTY(io.StringIO):
+    def isatty(self):
+        return True
 
 
 class CliTests(TempEnvCase):
@@ -22,8 +29,9 @@ class CliTests(TempEnvCase):
 
     def test_end_to_end(self):
         src = self.make_source("ClientX")
-        code, out, _ = self.run_cli("add", str(src), "--delete")
-        self.assertEqual(code, 0)
+        code, out, err = self.run_cli("add", str(src), "--delete")
+        self.assertEqual((code, err), (0, ""))  # stderr is not a TTY here: no progress output
+        self.assertEqual(out.count("\n"), 2)  # id + path, "deleted ..."
         archive_id = out.split()[0]
         self.assertTrue(archive_id.startswith("ClientX-"))
         self.assertFalse(src.exists())
@@ -46,6 +54,17 @@ class CliTests(TempEnvCase):
         self.assertEqual(code, 1)
         self.assertIn("arc: error:", err)
         self.assertIn("--force", err)
+
+    def test_error_starts_on_own_line_after_progress(self):
+        src = self.make_source()
+        out, err = io.StringIO(), FakeTTY()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err), \
+                mock.patch.object(tarfile.TarFile, "addfile", side_effect=OSError("disk full")):
+            code = cli.main(["add", str(src)])
+        self.assertEqual(code, 1)
+        self.assertIn("compressing", err.getvalue())
+        self.assertIn("\narc: error: disk full", err.getvalue())
+        self.assertEqual(out.getvalue(), "")
 
     def test_empty_list(self):
         self.assertEqual(self.run_cli("list"), (0, "", ""))
