@@ -83,7 +83,7 @@ class ArchiverTests(TempEnvCase):
 
     def test_compression_failure_leaves_nothing(self):
         src = self.make_source()
-        with mock.patch.object(tarfile.TarFile, "add", side_effect=OSError("disk full")):
+        with mock.patch.object(tarfile.TarFile, "addfile", side_effect=OSError("disk full")):
             with self.assertRaises(OSError):
                 archiver.create(src, self.config, delete=True, now=NOW)
         self.assert_nothing_written()
