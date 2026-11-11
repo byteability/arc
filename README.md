@@ -66,6 +66,9 @@ It keeps a release PR open that bumps `version` in `pyproject.toml` and updates 
 merging that PR tags `vX.Y.Z`, creates the GitHub release, and attaches the sdist, wheel and `SHA256SUMS`.
 Before 1.0: `fix:` → patch, `feat:` and breaking changes → minor. Don't edit the version or push tags by hand.
 
+`main` is protected by rulesets: changes land only through squash-merged PRs that pass the `test` check, and `v*` tags are immutable.
+Release PRs opened by release-please don't trigger CI, so a repository admin merges them using the check bypass.
+
 ## License
 
 [MIT](LICENSE) © Byteability
