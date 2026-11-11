@@ -6,7 +6,7 @@ Python ≥ 3.14, no third-party dependencies.
 ## Install
 
 ```sh
-uv tool install --python ">=3.14" .
+uv tool install --reinstall --python ">=3.14" .   # --reinstall: otherwise uv may reuse a stale cached build of this folder
 ```
 
 ## Configure
@@ -32,6 +32,7 @@ arc list [--limit N]
 arc search clientx             # case-insensitive match on source path or id
 arc restore proj-20261110T101530Z [--to DIR] [--force]
 arc --version                  # version and install source, e.g. "arc 0.1.0 (arc-0.1.0-py3-none-any.whl)"
+arc update [--force]           # install the latest release (needs gh and uv; --force for non-release installs)
 ```
 
 History is stored in `$ARCHIVE_DIR/history.jsonl`, one JSON object per line.

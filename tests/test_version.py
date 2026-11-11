@@ -5,7 +5,7 @@ import unittest
 from importlib import metadata
 from unittest import mock
 
-from arc import cli
+from arc import cli, install
 
 
 class FakeDist:
@@ -18,8 +18,8 @@ class FakeDist:
 
 
 def version_with(direct_url=None):
-    with mock.patch.object(cli.metadata, "distribution", return_value=FakeDist(direct_url=direct_url)):
-        return cli.version_string()
+    with mock.patch.object(install.metadata, "distribution", return_value=FakeDist(direct_url=direct_url)):
+        return install.version_string()
 
 
 class VersionStringTests(unittest.TestCase):
@@ -49,8 +49,8 @@ class VersionStringTests(unittest.TestCase):
                 self.assertEqual(version_with(record), "arc 0.1.0")
 
     def test_not_installed(self):
-        with mock.patch.object(cli.metadata, "distribution", side_effect=metadata.PackageNotFoundError("arc")):
-            self.assertEqual(cli.version_string(), "arc (not installed)")
+        with mock.patch.object(install.metadata, "distribution", side_effect=metadata.PackageNotFoundError("arc")):
+            self.assertEqual(install.version_string(), "arc (not installed)")
 
 
 class VersionFlagTests(unittest.TestCase):
@@ -58,7 +58,7 @@ class VersionFlagTests(unittest.TestCase):
         out, err = io.StringIO(), io.StringIO()
         env = {k: v for k, v in os.environ.items() if k != "ARCHIVE_DIR"}
         with mock.patch.dict(os.environ, env, clear=True), \
-                mock.patch.object(cli.metadata, "distribution", return_value=FakeDist()), \
+                mock.patch.object(install.metadata, "distribution", return_value=FakeDist()), \
                 contextlib.redirect_stdout(out), contextlib.redirect_stderr(err), \
                 self.assertRaises(SystemExit) as exit_info:
             cli.main(["--version"])

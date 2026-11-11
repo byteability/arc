@@ -1,17 +1,15 @@
 """Command-line entry point."""
 
 import argparse
-import json
 import sys
 import tarfile
-from importlib import metadata
-from pathlib import PurePosixPath
-from urllib.parse import unquote, urlparse
 
-from arc import archiver, config, history, restore
+from arc import archiver, config, history, restore, update
 from arc.archiver import ArchiveError
 from arc.config import ConfigError
+from arc.install import version_string
 from arc.progress import Progress, human_size
+from arc.update import UpdateError
 
 EXIT_OK, EXIT_ERROR, EXIT_USAGE = 0, 1, 2
 
@@ -19,32 +17,6 @@ EXIT_OK, EXIT_ERROR, EXIT_USAGE = 0, 1, 2
 def format_row(r: dict) -> str:
     deleted = "[deleted]" if r.get("source_deleted") else ""
     return f"{r.get('id', '?')}  {r.get('timestamp', '?')}  {human_size(r.get('size_after', 0)):>9}  {deleted:9}  {r.get('source_path', '?')}"
-
-
-def _install_source(info: dict) -> str | None:
-    """Describe a PEP 610 direct_url.json record."""
-    path = unquote(urlparse(info.get("url", "")).path)
-    if isinstance(info.get("vcs_info"), dict):
-        return f"git: {info['vcs_info'].get('commit_id', '')[:7]}"
-    if isinstance(info.get("dir_info"), dict):
-        return f"local, editable: {path}" if info["dir_info"].get("editable") else f"local: {path}"
-    if "archive_info" in info:
-        return PurePosixPath(path).name
-    return None
-
-
-def version_string() -> str:
-    try:
-        dist = metadata.distribution("arc")
-    except metadata.PackageNotFoundError:
-        return "arc (not installed)"
-    text = f"arc {dist.version}"
-    try:
-        info = json.loads(dist.read_text("direct_url.json") or "null")
-    except json.JSONDecodeError:
-        return text
-    source = _install_source(info) if isinstance(info, dict) else None
-    return f"{text} ({source})" if source else text
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -69,10 +41,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("id")
     p.add_argument("--to", help="restore into this directory instead of the original location")
     p.add_argument("--force", action="store_true", help="overwrite an existing target")
+
+    p = sub.add_parser("update", help="install the latest release")
+    p.add_argument("--force", action="store_true", help="reinstall the latest release even if it can't be compared")
     return parser
 
 
 def run(args: argparse.Namespace, progress: Progress) -> None:
+    if args.command == "update":
+        print(update.update(force=args.force))
+        return
     cfg = config.load({"ARCHIVE_DIR": args.archive_dir})
     if args.command == "add":
         rec = archiver.create(args.folder, cfg, delete=args.delete, progress=progress)
@@ -94,7 +72,7 @@ def main(argv: list[str] | None = None) -> int:
     progress = Progress()
     try:
         run(args, progress)
-    except (ConfigError, ArchiveError, OSError, tarfile.TarError) as e:
+    except (ConfigError, ArchiveError, UpdateError, OSError, tarfile.TarError) as e:
         progress.close()
         print(f"arc: error: {e}", file=sys.stderr)
         return EXIT_USAGE if isinstance(e, ConfigError) else EXIT_ERROR
