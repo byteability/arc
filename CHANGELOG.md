@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/byteability/arc/compare/v0.4.0...v0.4.1) (2026-11-11)
+
+
+### Documentation
+
+* describe main and release tag protection ([#17](https://github.com/byteability/arc/issues/17)) ([fc0708d](https://github.com/byteability/arc/commit/fc0708d89483213617bc01d3d6ff9d0fd85e0b89))
+
 ## [0.4.0](https://github.com/byteability/arc/compare/v0.3.1...v0.4.0) (2026-11-11)
 
 
