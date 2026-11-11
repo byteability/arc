@@ -31,6 +31,7 @@ arc add ~/work/proj --delete   # delete source only after the archive is verifie
 arc list [--limit N]
 arc search clientx             # case-insensitive match on source path or id
 arc restore proj-20261110T101530Z [--to DIR] [--force]
+arc --version                  # version and install source, e.g. "arc 0.1.0 (arc-0.1.0-py3-none-any.whl)"
 ```
 
 History is stored in `$ARCHIVE_DIR/history.jsonl`, one JSON object per line.
