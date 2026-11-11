@@ -67,7 +67,8 @@ merging that PR tags `vX.Y.Z`, creates the GitHub release, and attaches the sdis
 Before 1.0: `fix:` → patch, `feat:` and breaking changes → minor. Don't edit the version or push tags by hand.
 
 `main` is protected by rulesets: changes land only through squash-merged PRs that pass the `test` check, and `v*` tags are immutable.
-Release PRs opened by release-please don't trigger CI, so a repository admin merges them using the check bypass.
+CI on release PRs opened by release-please waits for approval ("Approve and run" on the PR) because a bot opened them;
+approve it and merge once `test` passes. Repository admins can also merge them through the check bypass.
 
 ## License
 
