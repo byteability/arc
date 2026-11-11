@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/byteability/arc/compare/v0.3.1...v0.4.0) (2026-11-11)
+
+
+### Features
+
+* install and update without gh (public releases, MIT license) ([#15](https://github.com/byteability/arc/issues/15)) ([1c97ac0](https://github.com/byteability/arc/commit/1c97ac0dc8767b3a1827c47600f35072a817c173))
+
 ## [0.3.1](https://github.com/byteability/arc/compare/v0.3.0...v0.3.1) (2026-11-11)
 
 
