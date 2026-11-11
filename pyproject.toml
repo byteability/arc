@@ -1,6 +1,6 @@
 [project]
 name = "arc"
-version = "0.1.0"
+version = "0.2.0"
 description = "Archive folders to tar.zst with a searchable history and restore"
 readme = "README.md"
 requires-python = ">=3.14"
