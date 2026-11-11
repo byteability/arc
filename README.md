@@ -5,6 +5,18 @@ Python ≥ 3.14, no third-party dependencies.
 
 ## Install
 
+Needs [uv](https://docs.astral.sh/uv/) (it fetches Python ≥ 3.14 if necessary). No GitHub account or `gh` required.
+Take the wheel URL from the [latest release](https://github.com/byteability/arc/releases/latest):
+
+```sh
+uv tool install --python ">=3.14" https://github.com/byteability/arc/releases/download/vX.Y.Z/arc-X.Y.Z-py3-none-any.whl
+arc --version                  # arc X.Y.Z (arc-X.Y.Z-py3-none-any.whl)
+```
+
+Update later with `arc update`. Installs of 0.3.1 or older still need `gh` for one more update; alternatively reinstall with the command above.
+
+From a checkout (development):
+
 ```sh
 uv tool install --reinstall --python ">=3.14" .   # --reinstall: otherwise uv may reuse a stale cached build of this folder
 ```
@@ -32,7 +44,7 @@ arc list [--limit N]
 arc search clientx             # case-insensitive match on source path or id
 arc restore proj-20261110T101530Z [--to DIR] [--force]
 arc --version                  # version and install source, e.g. "arc 0.1.0 (arc-0.1.0-py3-none-any.whl)"
-arc update [--force]           # install the latest release (needs gh and uv; --force for non-release installs)
+arc update [--force]           # install the latest release (needs uv; --force for non-release installs)
 ```
 
 History is stored in `$ARCHIVE_DIR/history.jsonl`, one JSON object per line.
@@ -53,3 +65,7 @@ Releases are automated with [release-please](https://github.com/googleapis/relea
 It keeps a release PR open that bumps `version` in `pyproject.toml` and updates `CHANGELOG.md`;
 merging that PR tags `vX.Y.Z`, creates the GitHub release, and attaches the sdist, wheel and `SHA256SUMS`.
 Before 1.0: `fix:` → patch, `feat:` and breaking changes → minor. Don't edit the version or push tags by hand.
+
+## License
+
+[MIT](LICENSE) © Byteability
