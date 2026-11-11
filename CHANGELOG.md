@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/byteability/arc/compare/v0.4.1...v0.4.2) (2026-11-11)
+
+
+### Documentation
+
+* add user documentation and slim down README ([#20](https://github.com/byteability/arc/issues/20)) ([67049d8](https://github.com/byteability/arc/commit/67049d86415eac33b3efc13b41bd0cfbb3834c57))
+
 ## [0.4.1](https://github.com/byteability/arc/compare/v0.4.0...v0.4.1) (2026-11-11)
 
 
