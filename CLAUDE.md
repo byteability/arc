@@ -9,13 +9,13 @@ The source folder is deleted only with `--delete`, after the archive is verified
 ## Stack and constraints
 
 - Python >= 3.14, stdlib only (zstd via `compression.zstd`/`tarfile`). Do not add runtime dependencies.
-- Layout: `src/arc/` (`cli`, `config`, `archiver`, `history`, `restore`), tests in `tests/` (stdlib `unittest`).
+- Layout: `src/arc/` (`cli`, `config`, `archiver`, `history`, `restore`, `progress`, `install`, `update`), tests in `tests/` (stdlib `unittest`).
 - Config precedence: `--archive-dir` flag > env > `~/.config/arc/.env` > defaults. A cwd `.env` is ignored by design.
 
 ## Commands
 
 - Tests: `PYTHONPATH=src python3 -m unittest discover -s tests`
-- Install: `uv tool install --python ">=3.14" .` (plain `uv tool install .` may pick an older Python)
+- Install from the repo: `uv tool install --reinstall --python ">=3.14" .` (`--python`: older uv may pick an older interpreter; `--reinstall`: otherwise uv may reuse a stale cached build of the folder when `pyproject.toml` is unchanged). Users should install releases and use `arc update`.
 - Releases: automated by release-please from Conventional Commits (merge its release PR). Never edit `version` in `pyproject.toml` or push `v*` tags by hand.
 
 ## Invariants (do not break)
