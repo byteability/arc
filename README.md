@@ -1,75 +1,43 @@
 # arc
 
-Archive folders to `tar.zst` in a local directory, with an append-only history and restore.
+Archive folders to compressed `tar.zst` files in one directory, keep an append-only history of what was archived, and restore any archive by id.
+The source folder is deleted only if you ask, and only after the archive is verified and recorded.
 Python ≥ 3.14, no third-party dependencies.
 
 ## Install
 
-Needs [uv](https://docs.astral.sh/uv/) (it fetches Python ≥ 3.14 if necessary). No GitHub account or `gh` required.
-Take the wheel URL from the [latest release](https://github.com/byteability/arc/releases/latest):
+Needs [uv](https://docs.astral.sh/uv/). No GitHub account or `gh` required.
+Copy the wheel URL from the [latest release](https://github.com/byteability/arc/releases/latest):
 
 ```sh
 uv tool install --python ">=3.14" https://github.com/byteability/arc/releases/download/vX.Y.Z/arc-X.Y.Z-py3-none-any.whl
-arc --version                  # arc X.Y.Z (arc-X.Y.Z-py3-none-any.whl)
 ```
 
-Update later with `arc update`. Installs of 0.3.1 or older still need `gh` for one more update; alternatively reinstall with the command above.
+Update later with `arc update`.
 
-From a checkout (development):
+## Quick start
 
 ```sh
-uv tool install --reinstall --python ">=3.14" .   # --reinstall: otherwise uv may reuse a stale cached build of this folder
+mkdir -p /Volumes/Data/archive && mkdir -p ~/.config/arc
+echo 'ARCHIVE_DIR=/Volumes/Data/archive' > ~/.config/arc/.env
+
+arc add ~/work/proj              # archive, keep the source
+arc add ~/work/proj --delete     # archive, then delete the source
+arc list                         # newest first
+arc search proj
+arc restore proj-20261111T101530Z [--to DIR]
 ```
 
-## Configure
+## Documentation
 
-```sh
-mkdir -p /Volumes/Data/archive          # arc never creates ARCHIVE_DIR
-mkdir -p ~/.config/arc
-cat > ~/.config/arc/.env <<'EOF'
-ARCHIVE_DIR=/Volumes/Data/archive
-ZSTD_LEVEL=10
-EOF
-```
+- [Getting started](https://github.com/byteability/arc/blob/main/docs/getting-started.md): install, configure, update
+- [Command reference](https://github.com/byteability/arc/blob/main/docs/commands.md)
+- [Safety guarantees](https://github.com/byteability/arc/blob/main/docs/safety.md)
+- [History file format](https://github.com/byteability/arc/blob/main/docs/history.md)
+- [Troubleshooting](https://github.com/byteability/arc/blob/main/docs/troubleshooting.md)
 
-Precedence: `--archive-dir` flag > environment variables > `~/.config/arc/.env` > defaults.
-A `.env` in the current directory is ignored.
-
-## Usage
-
-```sh
-arc add ~/work/proj            # -> $ARCHIVE_DIR/proj-20261110T101530Z.tar.zst
-arc add ~/work/proj --delete   # delete source only after the archive is verified and recorded
-arc list [--limit N]
-arc search clientx             # case-insensitive match on source path or id
-arc restore proj-20261110T101530Z [--to DIR] [--force]
-arc --version                  # version and install source, e.g. "arc 0.1.0 (arc-0.1.0-py3-none-any.whl)"
-arc update [--force]           # install the latest release (needs uv; --force for non-release installs)
-```
-
-History is stored in `$ARCHIVE_DIR/history.jsonl`, one JSON object per line.
-
-Progress bars for `add` and `restore` are shown on stderr when it is a terminal (never in pipes or scripts).
-Notes: symlinks are archived as links; `.DS_Store` files are skipped; extended attributes are not preserved.
-Exit codes: `0` ok, `1` error, `2` usage/config error.
-
-## Tests
-
-```sh
-PYTHONPATH=src python3 -m unittest discover -s tests
-```
-
-## Releases
-
-Releases are automated with [release-please](https://github.com/googleapis/release-please) from Conventional Commit messages.
-It keeps a release PR open that bumps `version` in `pyproject.toml` and updates `CHANGELOG.md`;
-merging that PR tags `vX.Y.Z`, creates the GitHub release, and attaches the sdist, wheel and `SHA256SUMS`.
-Before 1.0: `fix:` → patch, `feat:` and breaking changes → minor. Don't edit the version or push tags by hand.
-
-`main` is protected by rulesets: changes land only through squash-merged PRs that pass the `test` check, and `v*` tags are immutable.
-CI on release PRs opened by release-please waits for approval ("Approve and run" on the PR) because a bot opened them;
-approve it and merge once `test` passes. Repository admins can also merge them through the check bypass.
+Development, tests and releases: [CONTRIBUTING.md](https://github.com/byteability/arc/blob/main/CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE) © Byteability
+[MIT](https://github.com/byteability/arc/blob/main/LICENSE) © Byteability
