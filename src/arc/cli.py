@@ -1,8 +1,12 @@
 """Command-line entry point."""
 
 import argparse
+import json
 import sys
 import tarfile
+from importlib import metadata
+from pathlib import PurePosixPath
+from urllib.parse import unquote, urlparse
 
 from arc import archiver, config, history, restore
 from arc.archiver import ArchiveError
@@ -17,11 +21,38 @@ def format_row(r: dict) -> str:
     return f"{r.get('id', '?')}  {r.get('timestamp', '?')}  {human_size(r.get('size_after', 0)):>9}  {deleted:9}  {r.get('source_path', '?')}"
 
 
+def _install_source(info: dict) -> str | None:
+    """Describe a PEP 610 direct_url.json record."""
+    path = unquote(urlparse(info.get("url", "")).path)
+    if isinstance(info.get("vcs_info"), dict):
+        return f"git: {info['vcs_info'].get('commit_id', '')[:7]}"
+    if isinstance(info.get("dir_info"), dict):
+        return f"local, editable: {path}" if info["dir_info"].get("editable") else f"local: {path}"
+    if "archive_info" in info:
+        return PurePosixPath(path).name
+    return None
+
+
+def version_string() -> str:
+    try:
+        dist = metadata.distribution("arc")
+    except metadata.PackageNotFoundError:
+        return "arc (not installed)"
+    text = f"arc {dist.version}"
+    try:
+        info = json.loads(dist.read_text("direct_url.json") or "null")
+    except json.JSONDecodeError:
+        return text
+    source = _install_source(info) if isinstance(info, dict) else None
+    return f"{text} ({source})" if source else text
+
+
 def build_parser() -> argparse.ArgumentParser:
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--archive-dir", help="override ARCHIVE_DIR")
 
     parser = argparse.ArgumentParser(prog="arc", description="Archive folders to tar.zst with history and restore.")
+    parser.add_argument("--version", action="version", version=version_string())
     sub = parser.add_subparsers(dest="command", required=True)
 
     p = sub.add_parser("add", parents=[common], help="archive a folder")
