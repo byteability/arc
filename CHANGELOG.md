@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0](https://github.com/byteability/arc/compare/v0.1.0...v0.2.0) (2026-11-11)
+
+
+### Features
+
+* add --version flag showing version and install source ([523b4cf](https://github.com/byteability/arc/commit/523b4cf94dc88624075a871919a2ef4ac83b7138))
+* add --version flag showing version and install source ([4f1a485](https://github.com/byteability/arc/commit/4f1a48562f1bbbc3de8eeddc1a007820864aeac7))
+
 ## 0.1.0 (2026-11-10)
 
 
