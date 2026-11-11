@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/byteability/arc/compare/v0.3.0...v0.3.1) (2026-11-11)
+
+
+### Documentation
+
+* point changelog commit links at rewritten history ([e9c3a61](https://github.com/byteability/arc/commit/e9c3a6170d57b3642a7e1369535149839f9fef17))
+* point changelog commit links at rewritten history ([f31d0d1](https://github.com/byteability/arc/commit/f31d0d10b70e3aa8048f9e0ff042646e573d43c2))
+
 ## [0.3.0](https://github.com/byteability/arc/compare/v0.2.0...v0.3.0) (2026-11-11)
 
 
