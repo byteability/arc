@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/byteability/arc/compare/v0.2.0...v0.3.0) (2026-11-11)
+
+
+### Features
+
+* add arc update to install the latest release ([9d4c699](https://github.com/byteability/arc/commit/9d4c69953ebe40348a1c82329c04982c70f9accb))
+* add arc update to install the latest release ([7d4ab86](https://github.com/byteability/arc/commit/7d4ab860d409eeb1b3356bf92ac0f7d4fbd10085))
+
 ## [0.2.0](https://github.com/byteability/arc/compare/v0.1.0...v0.2.0) (2026-11-11)
 
 
