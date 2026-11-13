@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: arc
+  description: "Archives folders to tar.zst files with a searchable history and restore."
+  annotations:
+    github.com/project-slug: byteability/arc
+    rag/visibility: internal
+  tags:
+    - python
+spec:
+  type: library
+  lifecycle: production
+  owner: group:default/byteability
