@@ -3,10 +3,13 @@
 import argparse
 import sys
 import tarfile
+from datetime import UTC, datetime
+from pathlib import Path
 
-from arc import archiver, config, history, restore, update
+from arc import archiver, config, github, history, restore, update
 from arc.archiver import ArchiveError
 from arc.config import ConfigError
+from arc.github import GitHubError
 from arc.install import version_string
 from arc.progress import Progress, human_size
 from arc.update import UpdateError
@@ -47,16 +50,53 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def confirm_repo(folder: str, archive_dir: Path) -> str | None:
+    """Ask if the GitHub repo of the folder must be archived too. Return "owner/repo" on a Yes answer."""
+    src = archiver.validate_source(folder, archive_dir)
+    if not (sys.stdin.isatty() and sys.stderr.isatty()):
+        return None
+    repo = github.detect(src)
+    if repo is None:
+        return None
+    reason = github.check(repo)
+    if reason:
+        print(f"arc: note: GitHub repo {repo} found, but {reason}; not archiving it", file=sys.stderr)
+        return None
+    print(f"Archive GitHub repo {repo} as well? [y/N] ", end="", file=sys.stderr, flush=True)
+    return repo if sys.stdin.readline().strip().lower() in ("y", "yes") else None
+
+
+def archive_repo(repo: str, rec: dict, archive_dir: Path) -> None:
+    try:
+        github.archive(repo)
+    except GitHubError as e:
+        raise GitHubError(
+            f"archived to {archive_dir / rec['archive_path']} but archiving GitHub repo {repo} failed: {e}") from e
+    try:
+        history.append(archive_dir, {
+            "event": "repo_archived",
+            "id": rec["id"],
+            "timestamp": archiver.iso(datetime.now(UTC)),
+            "repo": repo,
+        })
+    except OSError as e:
+        raise GitHubError(f"GitHub repo {repo} is archived but the history append failed: {e}") from e
+    print(f"archived GitHub repo {repo}")
+
+
 def run(args: argparse.Namespace, progress: Progress) -> None:
     if args.command == "update":
         print(update.update(force=args.force))
         return
     cfg = config.load({"ARCHIVE_DIR": args.archive_dir})
     if args.command == "add":
+        repo = confirm_repo(args.folder, cfg.archive_dir)
         rec = archiver.create(args.folder, cfg, delete=args.delete, progress=progress)
         print(f"{rec['id']}  {cfg.archive_dir / rec['archive_path']}")
         if rec["source_deleted"]:
             print(f"deleted {rec['source_path']}")
+        if repo:
+            archive_repo(repo, rec, cfg.archive_dir)
     elif args.command in ("list", "search"):
         rows = (history.list_archives(cfg.archive_dir, args.limit) if args.command == "list"
                 else history.search(cfg.archive_dir, args.term))
@@ -72,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     progress = Progress()
     try:
         run(args, progress)
-    except (ConfigError, ArchiveError, UpdateError, OSError, tarfile.TarError) as e:
+    except (ConfigError, ArchiveError, GitHubError, UpdateError, OSError, tarfile.TarError) as e:
         progress.close()
         print(f"arc: error: {e}", file=sys.stderr)
         return EXIT_USAGE if isinstance(e, ConfigError) else EXIT_ERROR

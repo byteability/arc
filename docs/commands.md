@@ -57,6 +57,24 @@ deleted /Users/me/work/proj
 The archive id is the folder name plus the UTC time in seconds, so archiving the same folder twice within one second fails with `archive already exists`.
 `FOLDER` must be a real directory: not a symlink, not `/`, and not inside or containing `ARCHIVE_DIR`.
 
+### GitHub repo of the folder
+
+If `FOLDER` is a clone of a GitHub repo, `arc add` can also archive the repo on GitHub. Before compression starts, it asks:
+
+```
+Archive GitHub repo acme/proj as well? [y/N]
+```
+
+Type `y` or `yes` to accept. Any other answer, including Enter, means no. After the local archive is verified and recorded (and the source is deleted, with `--delete`), arc runs `gh repo archive acme/proj --yes` and prints `archived GitHub repo acme/proj`. The repo becomes read-only on GitHub. It is not deleted, and `gh repo unarchive acme/proj` reverses it.
+
+arc asks only when all of these are true:
+
+- The command runs on a terminal (stdin and stderr). Scripts and pipes never get the question, and arc then never changes GitHub.
+- `FOLDER/.git/config` has an `origin` remote on `github.com`, in the form `git@github.com:owner/repo`, `ssh://git@github.com/owner/repo` or `https://github.com/owner/repo`. SSH host aliases (for example `github-work:owner/repo`), other hosts, and clones in a parent folder or a subfolder are not detected.
+- The [GitHub CLI](https://cli.github.com/) (`gh`) is installed and logged in, the repo is not archived yet, and your account has admin permission on it. If not, arc prints an `arc: note:` line with the reason and continues with the local archive.
+
+arc stores no GitHub token. It uses the account that `gh` is logged in with.
+
 ## arc list
 
 ```

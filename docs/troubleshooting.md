@@ -45,6 +45,23 @@ The archive file is complete, but it couldn't be recorded, for example because `
 **`archived to … but deleting source failed: …`**
 The archive is complete and recorded, and a `delete_failed` event was added to the history. Some files in the source couldn't be removed (permissions, files in use). Remove what's left by hand once you've checked it.
 
+**`arc: note: GitHub repo … found, but …; not archiving it`**
+Not an error. The folder is a clone of a GitHub repo, but arc can't offer to archive the repo, and the local archive continues as normal. The reason is in the note:
+
+- `gh is not installed`: install the [GitHub CLI](https://cli.github.com/) if you want arc to archive repos.
+- `gh could not read it (…)`: `gh` isn't logged in, there is no network, or the repo no longer exists. Check with `gh auth status`.
+- `it is already archived`: nothing to do.
+- `you have no admin permission on it`: the account that `gh` uses can't archive this repo. Check the active account with `gh auth status` and change it with `gh auth switch`.
+
+**`archived to … but archiving GitHub repo … failed: …`**
+The local archive is complete and recorded, and with `--delete` the source is deleted. Only the GitHub step failed, and the reason from `gh` is at the end of the message. Fix the cause and run `gh repo archive owner/repo` yourself.
+
+**`GitHub repo … is archived but the history append failed: …`**
+The repo is archived on GitHub, but the `repo_archived` line couldn't be written to `history.jsonl` (disk full or not writable). The local archive and its `add` line are not affected.
+
+**The GitHub repo was archived by mistake**
+Run `gh repo unarchive owner/repo`.
+
 **Leftover files in `ARCHIVE_DIR/.tmp/`**
 If arc was killed while archiving, a `.part` file may remain. It isn't referenced by the history and can be deleted when no `arc add` is running.
 

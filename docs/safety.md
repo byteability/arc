@@ -15,6 +15,14 @@ Without `--delete`, the source is never touched.
 
 If deleting the source fails partway (for example, a file you aren't allowed to remove), arc appends a `delete_failed` event and exits with status 1. The archive is complete and usable; check the source folder for what is left. `arc list` won't mark that archive as `[deleted]`.
 
+## GitHub is changed only when you say yes
+
+If the folder is a clone of a GitHub repo, `arc add` asks if the repo must be archived on GitHub too (see the [command reference](commands.md#github-repo-of-the-folder)). The default answer is no, and a run that is not on a terminal is never asked.
+
+After a yes, arc archives the repo only after steps 1–6 succeeded. If the local archive, the history record or the source deletion fails, GitHub is not changed. The repo is set to read-only, never deleted, and `gh repo unarchive` reverses it.
+
+If GitHub refuses the request, arc exits with status 1. The local archive and its history record stay complete and usable.
+
 ## `ARCHIVE_DIR` is never created
 
 If `ARCHIVE_DIR` doesn't exist, every command except `update` stops with exit code 2. This is deliberate. If your archive disk isn't mounted, its mount point usually doesn't exist (or is a plain folder on the internal disk), and creating it would silently fill your internal disk. arc only creates its own `.tmp` folder inside an existing `ARCHIVE_DIR`.

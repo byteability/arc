@@ -44,6 +44,20 @@ This line is written only after the archive has been verified and moved into pla
 
 The archive itself is complete and usable. The source may be partly deleted.
 
+### `repo_archived`: the GitHub repo of the folder was archived
+
+```json
+{"event": "repo_archived", "id": "proj-20261111T101530Z", "timestamp": "2026-11-11T10:15:44Z", "repo": "acme/proj"}
+```
+
+| Field | Meaning |
+|---|---|
+| `id` | the archive made in the same `arc add` run |
+| `timestamp` | when GitHub accepted the request |
+| `repo` | the GitHub repo, as `owner/repo` |
+
+This line is written only when you answered yes to the question from `arc add` and GitHub archived the repo.
+
 ### `restore`: an archive was restored
 
 ```json
@@ -61,7 +75,7 @@ The archive itself is complete and usable. The source may be partly deleted.
 
 - Each `add` event is one archive. `list` shows them newest first, and `search` filters them by id or source path, ignoring case.
 - A `delete_failed` event for an archive sets its `source_deleted` to `false`, so `[deleted]` isn't shown for it.
-- `restore` events are kept as a log and don't change the list.
+- `restore` and `repo_archived` events are kept as a log and don't change the list.
 - Lines that aren't valid JSON objects are skipped with `arc: warning: skipping malformed history line N` on stderr. The rest of the file is still used.
 
 ## Using it from other tools

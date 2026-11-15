@@ -53,6 +53,12 @@ class HistoryTests(TempEnvCase):
         history.append(self.archive_dir, {"event": "restore", "id": "a"})
         self.assertEqual(len(history.list_archives(self.archive_dir)), 1)
 
+    def test_repo_archived_events_not_listed(self):
+        history.append(self.archive_dir, add("a", "/a"))
+        history.append(self.archive_dir, {"event": "repo_archived", "id": "a", "repo": "acme/proj"})
+        self.assertEqual(history.list_archives(self.archive_dir), [add("a", "/a")])
+        self.assertEqual(history.search(self.archive_dir, "acme"), [])
+
     def test_limit(self):
         for i in range(10):
             history.append(self.archive_dir, add(f"r{i}", f"/p{i}"))
