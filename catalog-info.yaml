@@ -5,6 +5,7 @@ metadata:
   description: "Archives folders to tar.zst files with a searchable history and restore."
   annotations:
     github.com/project-slug: byteability/arc
+    backstage.io/techdocs-ref: dir:.
     rag/visibility: internal
   tags:
     - python

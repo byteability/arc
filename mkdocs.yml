@@ -1,0 +1,10 @@
+site_name: arc
+nav:
+  - Overview: README.md
+  - Getting started: getting-started.md
+  - Command reference: commands.md
+  - Safety guarantees: safety.md
+  - History file: history.md
+  - Troubleshooting: troubleshooting.md
+plugins:
+  - techdocs-core
