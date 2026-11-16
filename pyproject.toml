@@ -1,6 +1,6 @@
 [project]
 name = "arc"
-version = "0.4.2"
+version = "0.5.0"
 description = "Archive folders to tar.zst with a searchable history and restore"
 readme = "README.md"
 license = "MIT"

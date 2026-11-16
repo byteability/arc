@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/byteability/arc/compare/v0.4.2...v0.5.0) (2026-11-16)
+
+
+### Features
+
+* offer to archive the GitHub repo on arc add ([#23](https://github.com/byteability/arc/issues/23)) ([6360052](https://github.com/byteability/arc/commit/6360052ab611f5e704184736ec77adc27bc74527))
+
+
+### Documentation
+
+* publish the docs to Backstage TechDocs ([#25](https://github.com/byteability/arc/issues/25)) ([0f94969](https://github.com/byteability/arc/commit/0f949690734be34d70ce760f7adf4cce23f89d78))
+
 ## [0.4.2](https://github.com/byteability/arc/compare/v0.4.1...v0.4.2) (2026-11-11)
 
 
