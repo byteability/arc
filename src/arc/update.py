@@ -40,6 +40,7 @@ def _open(url: str, accept: str):
     try:
         return urllib.request.urlopen(request, timeout=TIMEOUT)
     except urllib.error.HTTPError as e:
+        e.close()
         raise UpdateError(f"{url}: HTTP {e.code} {e.reason}") from None
     except (urllib.error.URLError, TimeoutError) as e:
         raise UpdateError(f"{url}: {getattr(e, 'reason', e)}") from None

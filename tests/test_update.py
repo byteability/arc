@@ -9,6 +9,7 @@ import sys
 import tempfile
 import threading
 import unittest
+import urllib.error
 from pathlib import Path
 from unittest import mock
 
@@ -225,6 +226,14 @@ class HttpTests(unittest.TestCase):
     def test_http_error_names_url_and_status(self):
         with self.assertRaisesRegex(UpdateError, r"/missing: HTTP 404"):
             update._get_json(f"{self.base}/missing")
+
+    def test_http_error_closes_response(self):
+        response = mock.Mock()
+        error = urllib.error.HTTPError("https://example.test/missing", 404, "Not Found", {}, response)
+        with mock.patch.object(update.urllib.request, "urlopen", side_effect=error):
+            with self.assertRaises(UpdateError):
+                update._open("https://example.test/missing", "application/json")
+        response.close.assert_called_once_with()
 
     def test_invalid_or_unexpected_json(self):
         with self.assertRaisesRegex(UpdateError, "not valid JSON"):
