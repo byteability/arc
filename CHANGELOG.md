@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/byteability/arc/compare/v0.5.0...v0.5.1) (2026-11-17)
+
+
+### Bug Fixes
+
+* close HTTPError response bodies ([#30](https://github.com/byteability/arc/issues/30)) ([46b5b89](https://github.com/byteability/arc/commit/46b5b89c5a90f1c5ef38703982921ac0025c554f))
+
 ## [0.5.0](https://github.com/byteability/arc/compare/v0.4.2...v0.5.0) (2026-11-16)
 
 
